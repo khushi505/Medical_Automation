@@ -21,6 +21,31 @@ const UserSchema = new mongoose.Schema(
       enum: ["patient", "doctor"],
       required: true,
     },
+    // Additional profile fields
+    hostelName: {
+      type: String,
+      default: "",
+    },
+    roomNo: {
+      type: String,
+      default: "",
+    },
+    branch: {
+      type: String,
+      default: "",
+    },
+    section: {
+      type: String,
+      default: "",
+    },
+    gender: {
+      type: String,
+      default: "",
+    },
+    contact: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );
