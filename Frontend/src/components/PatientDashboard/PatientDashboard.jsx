@@ -6,6 +6,8 @@ import BookSlot from "./BookSlot/BookSlot";
 import History from "./History/History";
 import Contact from "./Contact/Contact";
 import "./PatientDashboard.css";
+import Advisory from "./Advisory/Advisory";
+import LeaveForm from "./LeaveForm/LeaveForm";
 
 function PatientDashboard() {
   // Active tab state
@@ -90,6 +92,7 @@ function PatientDashboard() {
         onLogout={handleLogout}
         userName={user.name}
       />
+      {/* Main content area */}
       <div className="main-content-new">
         {activeTab === "profile" && (
           <ProfileSection user={user} hoursInfo={hoursInfo} />
@@ -110,8 +113,11 @@ function PatientDashboard() {
             onSimulate={handleAppointmentAcceptance}
           />
         )}
-
         {activeTab === "history" && <History appointments={appointments} />}
+        {/* Render Advisory below Medical History */}
+        {activeTab === "advisory" && <Advisory />}
+        {/* Render the LeaveForm here */}
+        {activeTab === "leave" && <LeaveForm />}
         {activeTab === "contact" && <Contact />}
       </div>
     </div>

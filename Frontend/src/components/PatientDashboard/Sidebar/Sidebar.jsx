@@ -46,6 +46,19 @@ function Sidebar({ activeTab, setActiveTab, onLogout }) {
             Medical History
           </li>
           <li
+            className={activeTab === "advisory" ? "active" : ""}
+            onClick={() => setActiveTab("advisory")}
+          >
+            ADVISORY
+          </li>
+          <li
+            className={activeTab === "leave" ? "active" : ""}
+            onClick={() => setActiveTab("leave")}
+          >
+            MEDICAL LEAVE
+          </li>
+
+          <li
             className={activeTab === "contact" ? "active" : ""}
             onClick={() => handleItemClick("contact")}
           >
@@ -61,7 +74,7 @@ function Sidebar({ activeTab, setActiveTab, onLogout }) {
       <div className="navbar-mobile">
         <div className="navbar-header">
           <img
-            src="/assets/srm-logo.png"
+            src="/assets/llogo.png"
             alt="SRM Logo"
             className="srm-navbar-logo"
           />
