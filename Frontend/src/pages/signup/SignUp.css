@@ -24,13 +24,15 @@ body {
   overflow: hidden; /* Hide horizontal overflow if any */
 }
 
-/* Left side: 3/4 background image */
+/* Left side: now 2 parts instead of 3 */
 .left-section-signup {
-  flex: 3;
-  position: relative; /* so we can overlay SRM logo if needed */
+  flex: 2;
+  position: relative;
   background: url("/assets/signup.jpg") no-repeat center center;
   background-size: cover;
-  background-color: #ccc; /* Fallback if image doesn't load */
+  border-top-right-radius: 30px; /* Adjust curve as desired */
+  border-bottom-right-radius: 30px;
+  overflow: hidden; /* Ensures the image doesn't spill outside the curve */
 }
 
 /* SRM logo overlay (optional) */
@@ -42,20 +44,21 @@ body {
   height: auto;
 }
 
-/* Right side: 1/4 sign-up form area */
+/* Right side: now 1 part instead of 1 (so total 2+1 = 3) */
 .right-section-signup {
   flex: 1;
   background-color: #f5f5f5; /* Slightly off-white background */
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 2rem; /* Extra padding to give more space */
 }
 
 /* The white "card" container for the sign-up form */
 .signup-card-distinct {
   background-color: #ffffff;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px; /* Increased from 400px to 450px */
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -170,6 +173,7 @@ body {
     flex: none;
     width: 100%;
     height: 40vh; /* Some vertical space for the image */
+    border-radius: 0; /* Remove radius on mobile if you prefer a full-width image */
   }
 
   .right-section-signup {
