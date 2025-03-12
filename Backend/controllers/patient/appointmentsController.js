@@ -41,14 +41,20 @@ export const getAppointments = async (req, res, next) => {
 // Book a new appointment (slot)
 export const bookAppointment = async (req, res, next) => {
   try {
-    const { appointmentDate, details } = req.body;
+    // 1. Extract doctorId from the request body
+    const { appointmentDate, details, doctorId } = req.body;
+
+    // 2. Generate a unique appointmentId (e.g., ddmmyyyy-01)
     const appointmentId = await appointmentService.generateAppointmentId(
       appointmentDate
     );
 
+    // 3. Create the appointment with status "Pending"
+    //    Assign the "doctor" field to doctorId (if provided)
     const appointment = await Appointment.create({
       appointmentId,
       patient: req.user._id,
+      doctor: null, // If doctorId is missing, it remains null
       appointmentDate,
       details,
       status: "Pending",
