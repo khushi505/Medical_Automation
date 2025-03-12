@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "./Sidebar";
-import ProfileSection from "./ProfileSection";
-import EditProfile from "./EditProfile";
-import BookSlot from "./BookSlot";
-import History from "./History";
-import Contact from "./Contact";
+import Sidebar from "./Sidebar/Sidebar";
+import ProfileSection from "./ProfileSection/ProfileSection";
+import EditProfile from "./EditProfile/EditProfile";
+import BookSlot from "./BookSlot/BookSlot";
+import History from "./History/History";
+import Contact from "./Contact/Contact";
 import "./PatientDashboard.css";
 
 function PatientDashboard() {
