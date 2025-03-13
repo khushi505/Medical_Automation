@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import "./SignUp.css";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./SignUp.css";
 
 function SignUp() {
   const [name, setName] = useState("");
@@ -15,18 +17,28 @@ function SignUp() {
   const [gender, setGender] = useState("");
   const [contact, setContact] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  // Handles form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Trim and lowercase the email
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail.endsWith("@srmap.edu.in")) {
+      const errMsg = "You must use your srmap.edu.in email address.";
+      setError(errMsg);
+      toast.error(errMsg);
+      return;
+    }
+
     try {
-      // **API Endpoint** for signup
       const response = await axios.post(
         "http://localhost:5000/api/auth/signup",
         {
           name,
-          email,
+          email: trimmedEmail,
           password,
+          role,
           hostelName,
           roomNo,
           branch,
@@ -35,28 +47,48 @@ function SignUp() {
           contact,
         }
       );
-      console.log("Signup successful:", response.data);
-      // Optionally, store token or navigate to login
+      console.log("Signup response:", response.data);
+      toast.success("Signup successful!");
+
+      // Check if user data with role is returned
+      const userData = response.data.user;
+      if (!userData || !userData.role) {
+        toast.error(
+          "Signup successful, but user role is missing. Redirecting to login."
+        );
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+        return;
+      }
+
+      // Delay redirection to allow toast visibility
+      setTimeout(() => {
+        if (userData.role === "student") {
+          navigate("/patient");
+        } else if (userData.role === "doctor") {
+          navigate("/doctor");
+        } else {
+          navigate("/patient");
+        }
+      }, 2000);
     } catch (err) {
-      console.error(
-        "Signup error:",
-        err.response?.data?.message || err.message
-      );
-      setError(err.response?.data?.message || "Signup failed");
+      const errorMsg = err.response?.data?.message || "Signup failed";
+      console.error("Signup error:", errorMsg);
+      setError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
-  // Handles Google sign-up
   const handleGoogleSignUp = () => {
-    // TODO: Implement Google sign-up logic
     console.log("Sign up with Google clicked");
+    toast.info("Google signup not implemented yet");
   };
 
   return (
     <div className="signup-container-distinct">
-      {/* Left side: 3/4 background image */}
+      {/* Left side: background image */}
       <div className="left-section-signup">
-        {/* Optional SRM logo overlay */}
         <img
           src="/assets/llogo.png"
           alt="SRM Logo"
@@ -64,11 +96,10 @@ function SignUp() {
         />
       </div>
 
-      {/* Right side: 1/4 sign-up card */}
+      {/* Right side: sign-up card */}
       <div className="right-section-signup">
         <div className="signup-card-distinct">
           <h2 className="title-signup">Create Account</h2>
-
           <form onSubmit={handleSubmit} className="signup-form-distinct">
             <label htmlFor="name">Name</label>
             <input
@@ -109,7 +140,6 @@ function SignUp() {
             >
               <option value="student">Student</option>
               <option value="doctor">Doctor</option>
-              {/* Add more roles if needed */}
             </select>
 
             <label htmlFor="hostelName">Hostel Name</label>
@@ -188,12 +218,12 @@ function SignUp() {
             <span>Sign up with Google</span>
           </button>
 
-          {/* Already have an account? Link to login */}
           <p className="login-text-distinct">
-            Already have an account? <Link to="/login">Log In</Link>
+            Already have an account? <Link to="/">Log In</Link>
           </p>
         </div>
       </div>
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }
