@@ -15,6 +15,7 @@ function Login() {
         "http://localhost:5000/api/auth/login",
         { email, password }
       );
+      localStorage.setItem("token", response.data.token);
       console.log("Login successful:", response.data);
       // Save token (e.g., localStorage.setItem("token", response.data.token)) and navigate to protected route
     } catch (err) {

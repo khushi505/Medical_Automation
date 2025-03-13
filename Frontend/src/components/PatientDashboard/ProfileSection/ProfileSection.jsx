@@ -1,7 +1,44 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./ProfileSection.css";
+import axios from "axios";
 
-function ProfileSection({ user, hoursInfo }) {
+function ProfileSection() {
+  // Store user details and hours info in local state
+  const [user, setUser] = useState(null);
+  const [hoursInfo, setHoursInfo] = useState({
+    opd: "8 AM to 5 PM on weekdays and 8 AM to 1 PM on Saturdays",
+    emergency: "24/7 emergency services. Phone: 1800-123-4567",
+    ambulance: "24/7 ambulance available",
+    pharmacy: "24/7 pharmacy available",
+  });
+
+  // Fetch user profile once component mounts
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // If no token, you could redirect to login or handle it here
+      return;
+    }
+
+    axios
+      .get("http://localhost:5000/api/patient/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass JWT in header
+        },
+      })
+      .then((response) => {
+        setUser(response.data.user); // Store the user details
+      })
+      .catch((error) => {
+        console.error("Error fetching profile:", error);
+      });
+  }, []);
+
+  // Show a loading state if user data is not yet fetched
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="profile-section-new">
       <h2 className="profile-title">Profile Details</h2>
