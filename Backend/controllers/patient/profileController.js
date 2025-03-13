@@ -14,11 +14,33 @@ export const getProfile = async (req, res, next) => {
 // Edit/Update the patient's profile
 export const editProfile = async (req, res, next) => {
   try {
-    const { hostelName, roomNo, branch, section, gender, contact } = req.body;
+    const {
+      name,
+      hostelName,
+      roomNo,
+      branch,
+      section,
+      gender,
+      contact,
+      weight,
+      height,
+      disease,
+    } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
-      { hostelName, roomNo, branch, section, gender, contact },
+      {
+        name,
+        hostelName,
+        roomNo,
+        branch,
+        section,
+        gender,
+        contact,
+        weight,
+        height,
+        disease,
+      },
       { new: true }
     ).select("-password");
 

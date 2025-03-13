@@ -8,48 +8,80 @@ import Contact from "./Contact/Contact";
 import "./PatientDashboard.css";
 import Advisory from "./Advisory/Advisory";
 import LeaveForm from "./LeaveForm/LeaveForm";
+import axios from "axios";
 
 function PatientDashboard() {
   // Active tab state
   const [activeTab, setActiveTab] = useState("profile");
 
-  // Example user data (replace with backend fetch)
+  // User state: initially empty; will be populated by backend fetch
   const [user, setUser] = useState({
-    name: "John Doe",
-    branch: "CSE",
-    hostelName: "DH-2",
-    roomNo: "301",
-    section: "A",
+    name: "",
+    branch: "",
+    hostelName: "",
+    roomNo: "",
+    section: "",
     weight: "",
     height: "",
     disease: "",
-    contact: "9876543210",
-    email: "john.doe@srmap.edu.in",
+    contact: "",
+    email: "",
   });
 
-  // Appointment state (replace with backend fetch)
+  // Appointment state (for appointments)
   const [appointments, setAppointments] = useState([]);
   const [newAppointment, setNewAppointment] = useState({
     date: "",
     details: "",
   });
 
-  // Edit profile data
+  // Edit profile data state: will be set to the fetched user details
   const [editData, setEditData] = useState({ ...user });
 
-  // Simulated data fetching (useEffect)
+  // Fetch actual user details from the backend on component mount
   useEffect(() => {
-    // TODO: Fetch user details and appointments from backend
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios
+        .get("http://localhost:5000/api/patient/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          const fetchedUser = response.data.user;
+          setUser(fetchedUser);
+          setEditData(fetchedUser);
+        })
+        .catch((error) => {
+          console.error("Error fetching profile:", error);
+        });
+    }
   }, []);
 
-  // Handlers
-  const handleProfileUpdate = (e) => {
+  // Handler to update profile via backend API
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    setUser({ ...editData });
-    alert("Profile updated successfully!");
-    setActiveTab("profile");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Not authenticated!");
+      return;
+    }
+    try {
+      const response = await axios.put(
+        "http://localhost:5000/api/patient/profile",
+        editData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Update the user state with the updated profile from backend
+      setUser(response.data.user);
+      alert("Profile updated successfully!");
+      setActiveTab("profile");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile!");
+    }
   };
 
+  // Handler to book appointment (simulated)
   const handleBookAppointment = (e) => {
     e.preventDefault();
     const newId = appointments.length + 1;
@@ -65,6 +97,7 @@ function PatientDashboard() {
     setNewAppointment({ date: "", details: "" });
   };
 
+  // Handler to update appointment status (simulated)
   const handleAppointmentAcceptance = (id, status) => {
     setAppointments((prev) =>
       prev.map((apt) => (apt.id === id ? { ...apt, status } : apt))
@@ -79,7 +112,7 @@ function PatientDashboard() {
     pharmacy: "24/7 pharmacy available",
   };
 
-  // Logout handler
+  // Logout handler (dummy)
   const handleLogout = () => {
     alert("Logging out...");
   };
@@ -114,9 +147,7 @@ function PatientDashboard() {
           />
         )}
         {activeTab === "history" && <History appointments={appointments} />}
-        {/* Render Advisory below Medical History */}
         {activeTab === "advisory" && <Advisory />}
-        {/* Render the LeaveForm here */}
         {activeTab === "leave" && <LeaveForm />}
         {activeTab === "contact" && <Contact />}
       </div>
