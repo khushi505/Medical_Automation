@@ -9,6 +9,7 @@ import "./PatientDashboard.css";
 import Advisory from "./Advisory/Advisory";
 import LeaveForm from "./LeaveForm/LeaveForm";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 function PatientDashboard() {
   // Active tab state
@@ -73,11 +74,15 @@ function PatientDashboard() {
       );
       // Update the user state with the updated profile from backend
       setUser(response.data.user);
-      alert("Profile updated successfully!");
-      setActiveTab("profile");
+      toast.success("Profile updated successfully!");
+
+      // Optionally, delay tab switch so the toast is visible
+      setTimeout(() => {
+        setActiveTab("profile");
+      }, 2000);
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile!");
+      toast.error("Failed to update profile!");
     }
   };
 
