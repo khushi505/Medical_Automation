@@ -1,38 +1,92 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import Snowfall from "react-snowfall";
 import "./Contactsrm.css";
 
-function Contact() {
+// Exact coordinates for SRM University AP
+const SRM_AP_COORDINATES = [16.462373, 80.506364];
+
+/* 
+  ZoomToSRM triggers a flyTo animation so the map smoothly centers on SRM AP.
+*/
+function ZoomToSRM() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.flyTo(SRM_AP_COORDINATES, 17, { animate: true, duration: 2 });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
+
+/*
+  Create a custom DivIcon that renders an inner <div> with the bounce-marker class.
+  This ensures the CSS animation is applied.
+*/
+const bounceMarkerIcon = L.divIcon({
+  html: `<div class="bounce-marker"></div>`,
+  iconSize: [30, 45],
+  iconAnchor: [15, 45],
+  popupAnchor: [0, -40],
+  className: "", // Leave empty to avoid extra wrapper styling
+});
+
+const Contact = () => {
   return (
     <div className="contact-page">
-      {/* Top section with contact info */}
+      {/* Top Contact Info */}
       <section className="contact-info-top">
         <h2>Contact Information</h2>
         <p className="address-line">
-          <strong>Address:</strong> SRM University AP, Amaravati, Andhra
-          Pradesh, India
+          <strong>Address:</strong> SRM University AP, India
         </p>
         <p className="phone-line">
           <strong>Phone:</strong> <a href="tel:+918662429299">0863-2343052</a>
         </p>
         <p className="email-line">
           <strong>Email:</strong>{" "}
-          <a href="mailto:info@srmap.edu.in">medicalcare@srmap.edu.in</a>
+          <a href="mailto:info@srmap.edu.in">info@srmap.edu.in</a>
         </p>
       </section>
 
-      {/* Map section with overlay card */}
+      {/* Map Section with Overlay */}
       <section className="map-section">
         <div className="map-wrapper">
-          <iframe
-            title="SRM University AP Pinned Location"
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3806.283392953162!2d80.538548!3d16.441983!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35ecba13ae18df%3A0x87fcd240e6f2712!2sSRM%20University%20AP!5e0!3m2!1sen!2sin!4v1696360109874!5m2!1sen!2sin"
-            width="100%"
-            height="600"
-            style={{ border: 0 }}
-            allowFullScreen=""
-            loading="lazy"
-          ></iframe>
+          <MapContainer
+            center={SRM_AP_COORDINATES}
+            zoom={5}
+            style={{ width: "100%", height: "100%" }}
+          >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <Marker position={SRM_AP_COORDINATES} icon={bounceMarkerIcon}>
+              <Popup>
+                <strong>SRM University AP</strong>
+                <br />
+                (16.462373, 80.506364)
+              </Popup>
+            </Marker>
+            <ZoomToSRM />
+          </MapContainer>
 
+          {/* Snowfall overlay */}
+          <Snowfall
+            snowflakeCount={150}
+            snowflakeStyle={{ color: "rgba(255,255,255,0.9)" }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              pointerEvents: "none",
+              zIndex: 1000,
+            }}
+          />
+
+          {/* Overlay Card - remains absolutely positioned, but shrinks on smaller screens */}
           <div className="overlay-card">
             <img
               src="/assets/3dsrm.jpg"
@@ -47,7 +101,7 @@ function Contact() {
             </p>
             <p>
               <strong>Phone:</strong>{" "}
-              <a href="tel:+918662429299"> 0863-2343052</a>
+              <a href="tel:+918662429299">0863-2343052</a>
             </p>
             <p>
               <strong>Email:</strong>{" "}
@@ -68,6 +122,6 @@ function Contact() {
       </section>
     </div>
   );
-}
+};
 
 export default Contact;
