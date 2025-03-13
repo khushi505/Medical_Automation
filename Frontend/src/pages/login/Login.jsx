@@ -1,43 +1,74 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import "./Login.css";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Trim email to remove leading/trailing spaces
+    const trimmedEmail = email.trim().toLowerCase();
+
+    // Validate that the email uses the SRM domain
+    if (!trimmedEmail.endsWith("@srmap.edu.in")) {
+      const errMsg = "You must use your srmap.edu.in email address.";
+      setError(errMsg);
+      toast.error(errMsg);
+      return;
+    }
+
     try {
-      // **API Endpoint** for login
+      // API Endpoint for login
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
-        { email, password }
+        { email: trimmedEmail, password }
       );
       console.log("Login successful:", response.data);
-      // Save token (e.g., localStorage.setItem("token", response.data.token)) and navigate to protected route
+      toast.success("Login successful!");
+
+      // Save token if needed
+      // localStorage.setItem("token", response.data.token);
+
+      // Delay navigation for 2 seconds to allow toast display
+      setTimeout(() => {
+        const role = response.data.user.role;
+        if (role === "patient") {
+          navigate("/patient");
+        } else if (role === "doctor") {
+          navigate("/doctor");
+        } else {
+          navigate("/");
+        }
+      }, 2000);
     } catch (err) {
-      console.error("Login error:", err.response?.data?.message || err.message);
-      setError(err.response?.data?.message || "Login failed");
+      const errorMsg = err.response?.data?.message || "Login failed";
+      console.error("Login error:", errorMsg);
+      setError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
   const handleGoogleLogin = () => {
-    // TODO: Add your Google login logic here
     console.log("Sign in with Google clicked");
+    toast.info("Google login not implemented yet");
   };
 
   return (
     <div className="login-container">
-      {/* Left side: 3/4 with background image */}
+      {/* Left side: background image */}
       <div className="left-section"></div>
 
-      {/* Right side: 1/4 background + card container */}
+      {/* Right side: card container */}
       <div className="right-section">
         <div className="login-card">
           <p className="title">Please Use Your University ID only</p>
-
           <form onSubmit={handleSubmit} className="login-form">
             <label htmlFor="email">Email</label>
             <input
@@ -46,6 +77,8 @@ function Login() {
               placeholder="yourname@srmap.edu.in"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoCapitalize="none"
+              autoCorrect="off"
               required
             />
 
@@ -66,9 +99,7 @@ function Login() {
 
           <div className="divider">OR</div>
 
-          {/* Sign in with Google button */}
           <button className="google-login-btn" onClick={handleGoogleLogin}>
-            {/* Replace the src below with your actual Google icon path */}
             <img
               src="/assets/google.png"
               alt="Google icon"
@@ -82,6 +113,8 @@ function Login() {
           </p>
         </div>
       </div>
+
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }
