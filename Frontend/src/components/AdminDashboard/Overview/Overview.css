@@ -15,7 +15,93 @@
   color: #333;
 }
 
-.admin-overview-container p {
-  font-size: 1rem;
+/* Row container for charts */
+.charts-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.chart-card {
+  flex: 1;
+  min-width: 300px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+/* Activities Section */
+.activities-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.activities-card {
+  flex: 1;
+  min-width: 300px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.activities-card h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+/* Recent Activities List */
+.activities-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.activities-card li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+  font-size: 0.95rem;
   color: #555;
+}
+
+.activities-card li:last-child {
+  border-bottom: none;
+}
+
+/* Top 5 Busy Doctors Table */
+.activities-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.activities-card table th,
+.activities-card table td {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.activities-card table th {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+@media (max-width: 600px) {
+  .admin-overview-container {
+    padding: 1rem;
+    margin: 1rem;
+  }
 }
