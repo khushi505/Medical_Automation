@@ -30,6 +30,7 @@ function Login() {
         "http://localhost:5000/api/auth/login",
         { email: trimmedEmail, password }
       );
+      localStorage.setItem("token", response.data.token);
       console.log("Login successful:", response.data);
       toast.success("Login successful!");
 
