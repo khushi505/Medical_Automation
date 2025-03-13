@@ -29,6 +29,9 @@ function PatientDashboard() {
   });
 
   // Appointment state (for appointments)
+  // const [user, setUser] = useState({
+  //   /* ... */
+  // });
   const [appointments, setAppointments] = useState([]);
   const [newAppointment, setNewAppointment] = useState({
     date: "",
@@ -82,21 +85,47 @@ function PatientDashboard() {
   };
 
   // Handler to book appointment (simulated)
-  const handleBookAppointment = (e) => {
+  const handleBookAppointment = async (e) => {
     e.preventDefault();
-    const newId = appointments.length + 1;
-    const newApt = {
-      id: newId,
-      date: newAppointment.date,
-      details: newAppointment.details,
-      status: "Pending",
-      prescription: "",
-    };
-    setAppointments([...appointments, newApt]);
-    alert("Appointment booked successfully!");
-    setNewAppointment({ date: "", details: "" });
-  };
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Not authenticated!");
+      return;
+    }
+
+    try {
+      // Combine date & time for the backend
+      const appointmentDate = `${newAppointment.date} ${newAppointment.time}`;
+
+      // Make POST request to book-appointment
+      const response = await axios.post(
+        "http://localhost:5000/api/patient/book-appointment",
+        {
+          appointmentDate,
+          details: newAppointment.details,
+          doctorId: newAppointment.doctor,
+          // "doctor" here is just a string from <select>.
+          // If your backend expects an actual doctor _id,
+          // you need to store that ID in newAppointment.doctor instead.
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // 2) Update local state (optional)
+      setAppointments((prev) => [...prev, response.data.appointment]);
+
+      alert("Appointment booked successfully!");
+
+      // 3) Reset the form
+      setNewAppointment({ doctor: "", date: "", time: "", details: "" });
+    } catch (error) {
+      console.error("Error booking appointment:", error);
+      alert("Failed to book appointment!");
+    }
+  };
   // Handler to update appointment status (simulated)
   const handleAppointmentAcceptance = (id, status) => {
     setAppointments((prev) =>
