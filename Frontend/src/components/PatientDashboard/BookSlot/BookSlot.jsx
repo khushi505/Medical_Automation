@@ -11,41 +11,10 @@ function BookSlot({
   // Refs for date input if needed
   const dateInputRef = useRef(null);
 
-  // List of doctors for selection
-  const doctors = [
-    "Dr Venkata Abhinay Talasila",
-    "Dr Sabeeha Farheen Sirvella",
-    "Dr Raju Dudam",
-  ];
-
   return (
     <div className="book-slot-card">
       <h2>Book an Appointment</h2>
       <form onSubmit={onBook} className="book-slot-form">
-        {/* Doctor Selection */}
-        <div className="form-group">
-          <label>Doctor</label>
-          <select
-            value={newAppointment.doctor || ""}
-            onChange={(e) =>
-              setNewAppointment({
-                ...newAppointment,
-                doctor: e.target.value,
-              })
-            }
-            required
-          >
-            <option value="" disabled>
-              Select a Doctor
-            </option>
-            {doctors.map((doc, index) => (
-              <option key={index} value={doc}>
-                {doc}
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* Date Selection */}
         <div className="form-group">
           <label>Date</label>
