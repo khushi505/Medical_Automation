@@ -155,6 +155,44 @@ function PatientDashboard() {
     alert("Logging out...");
   };
 
+  const handleLeaveFormSubmit = async (formDataObj) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Not authenticated!");
+      return { message: "Not authenticated" };
+    }
+    try {
+      // Build FormData for multipart/form-data upload
+      const formData = new FormData();
+      formData.append("reason", formDataObj.reason);
+      formData.append("symptoms", formDataObj.symptoms);
+      formData.append("illnessStartDate", formDataObj.startDate);
+      formData.append("illnessEndDate", formDataObj.endDate);
+      formData.append("consultedDoctor", formDataObj.doctorConsulted);
+      formData.append("severity", formDataObj.severity);
+      // Field name "report" must match the backend's upload.single("report")
+      if (formDataObj.reportFile) {
+        formData.append("report", formDataObj.reportFile);
+      }
+      const response = await axios.post(
+        "http://localhost:5000/api/patient/submit-leave",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      alert(response.data.message);
+      return response.data;
+    } catch (error) {
+      console.error("Error submitting leave form:", error);
+      alert("Failed to submit leave form!");
+      return { message: "Submission failed" };
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -209,8 +247,11 @@ function PatientDashboard() {
         )}
         {activeTab === "history" && <History appointments={appointments} />}
         {activeTab === "advisory" && <Advisory />}
-        {activeTab === "leave" && <LeaveForm />}
         {activeTab === "contact" && <Contact />}
+
+        {activeTab === "leave" && (
+          <LeaveForm onSubmit={handleLeaveFormSubmit} />
+        )}
       </div>
     </div>
   );

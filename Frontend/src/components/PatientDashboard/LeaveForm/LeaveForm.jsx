@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "./LeaveForm.css";
+// import axios from "axios";
 
-function LeaveForm() {
+function LeaveForm({ onSubmit }) {
   const [reason, setReason] = useState("");
   const [symptoms, setSymptoms] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -14,42 +15,23 @@ function LeaveForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // In a real scenario, you'd build form data and send it to your backend:
-    // const formData = new FormData();
-    // formData.append("reason", reason);
-    // formData.append("symptoms", symptoms);
-    // formData.append("startDate", startDate);
-    // formData.append("endDate", endDate);
-    // formData.append("doctorConsulted", doctorConsulted);
-    // formData.append("severity", severity);
-    // if (reportFile) formData.append("reportFile", reportFile);
-
-    // Example fetch:
-    // const response = await fetch("/api/patient/leave", {
-    //   method: "POST",
-    //   body: formData,
-    // });
-    // const data = await response.json();
-
     // For now, we simulate a success response:
-    const data = {
-      message: "Leave form submitted successfully",
-      leaveForm: {
-        reason,
-        symptoms,
-        startDate,
-        endDate,
-        doctorConsulted,
-        severity,
-        reportFile: reportFile ? reportFile.name : null,
-        status: "Pending",
-        _id: "generated-id",
-        createdAt: new Date().toISOString(),
-      },
+    const formDataObj = {
+      reason,
+      symptoms,
+      startDate,
+      endDate,
+      doctorConsulted,
+      severity,
+      reportFile,
+      status: "Pending",
+      _id: "generated-id",
+      createdAt: new Date().toISOString(),
     };
 
-    setStatusMessage(data.message);
-    // Reset form
+    const result = await onSubmit(formDataObj);
+    setStatusMessage(result.message);
+
     setReason("");
     setSymptoms("");
     setStartDate("");
@@ -134,8 +116,8 @@ function LeaveForm() {
               <input
                 type="radio"
                 name="severity"
-                value="mild"
-                checked={severity === "mild"}
+                value="Mild"
+                checked={severity === "Mild"}
                 onChange={(e) => setSeverity(e.target.value)}
               />
               Mild
@@ -144,8 +126,8 @@ function LeaveForm() {
               <input
                 type="radio"
                 name="severity"
-                value="moderate"
-                checked={severity === "moderate"}
+                value="Moderate"
+                checked={severity === "Moderate"}
                 onChange={(e) => setSeverity(e.target.value)}
               />
               Moderate
@@ -154,8 +136,8 @@ function LeaveForm() {
               <input
                 type="radio"
                 name="severity"
-                value="severe"
-                checked={severity === "severe"}
+                value="Severe"
+                checked={severity === "Severe"}
                 onChange={(e) => setSeverity(e.target.value)}
               />
               Severe

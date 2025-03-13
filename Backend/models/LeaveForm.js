@@ -40,6 +40,9 @@ const LeaveFormSchema = new mongoose.Schema(
       type: String,
       required: false, // If the file is optional, make this non-required
     },
+
+    reportFileName: { type: String, default: "" },
+
     status: {
       type: String,
       enum: ["Pending", "Approved", "Rejected"],

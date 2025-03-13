@@ -18,7 +18,12 @@ export const getLeaveForms = async (req, res, next) => {
  * We now include the additional fields from the front-end form:
  * symptoms, illnessStartDate, illnessEndDate, severity, consultedDoctor
  */
-export const submitLeaveFormWithGridFS = async (req, gridFsFileId, next) => {
+export const submitLeaveFormWithGridFS = async (
+  req,
+  gridFsFileId,
+  next,
+  fileName
+) => {
   try {
     // Extract new fields plus the existing reason field
     const {
@@ -41,6 +46,7 @@ export const submitLeaveFormWithGridFS = async (req, gridFsFileId, next) => {
       consultedDoctor: consultedDoctor === "true" || false,
       // If a file was uploaded, store the GridFS ID; otherwise keep empty or undefined
       reportFile: gridFsFileId || "",
+      reportFileName: fileName || "",
       status: "Pending",
     });
     return leaveForm;
