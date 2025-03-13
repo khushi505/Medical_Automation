@@ -14,27 +14,26 @@ function Advisory({ advisories }) {
         "Get vaccinated; wash your hands regularly; avoid crowded places.",
       announcementBy: "Dr. Sharma",
       severity: "High", // or "Medium" or "Low"
-      imageUrl: "/assets/flu.png", // optional image
+      imageUrl: "/assets/flu.png",
     },
     {
       id: 2,
       title: "Dengue Alert",
       date: "2023-10-20",
       description:
-        "Dengue cases are on the rise in certain areas. Watch out for fever, headache, muscle and joint pains, and a characteristic skin rash that is similar to measles.",
+        "Dengue cases are on the rise in certain areas. Watch out for fever, headache, muscle and joint pains, and a characteristic skin rash.",
       precautions:
         "Use mosquito repellent; eliminate stagnant water; wear protective clothing.",
       announcementBy: "Dr. Reddy",
       severity: "Medium",
       imageUrl: "/assets/dengue.png",
-      // no imageUrl, so no image displayed for this card
     },
     {
       id: 3,
       title: "Waterborne Diseases",
       date: "2023-10-05",
       description:
-        "Contaminated water sources have been reported in some neighborhoods. Common waterborne illnesses include cholera, typhoid, and dysentery. Ensure proper filtration or boiling of water before use.",
+        "Contaminated water sources have been reported in some neighborhoods. Common waterborne illnesses include cholera, typhoid, and dysentery.",
       precautions: "Boil water before use; avoid consuming unfiltered water.",
       announcementBy: "Dr. Verma",
       severity: "Low",
@@ -54,11 +53,13 @@ function Advisory({ advisories }) {
           <AdvisoryCard key={advisory.id} advisory={advisory} />
         ))}
       </div>
+
+      <FluPrevention />
     </div>
   );
 }
 
-// A sub-component to handle the read-more toggle, severity badge, etc.
+// A sub-component for individual advisory cards
 function AdvisoryCard({ advisory }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -71,7 +72,6 @@ function AdvisoryCard({ advisory }) {
 
   return (
     <div className="advisory-card">
-      {/* Optional image */}
       {advisory.imageUrl && (
         <img
           src={advisory.imageUrl}
@@ -80,7 +80,6 @@ function AdvisoryCard({ advisory }) {
         />
       )}
 
-      {/* Title + Severity Badge */}
       <div className="advisory-header">
         <h3 className="advisory-title">{advisory.title}</h3>
         {advisory.severity && (
@@ -95,7 +94,6 @@ function AdvisoryCard({ advisory }) {
 
       <p className="advisory-date">{advisory.date}</p>
 
-      {/* Description with Read More toggle */}
       <p className="advisory-description">
         {isLong && !expanded ? shortDesc : advisory.description}
       </p>
@@ -118,7 +116,54 @@ function AdvisoryCard({ advisory }) {
   );
 }
 
-// Helper function to map severity to color
+// Sub-component for additional Flu Prevention Tips & Resources
+function FluPrevention() {
+  return (
+    <div className="flu-prevention">
+      <h2>Flu Prevention Tips & Resources</h2>
+      <p>
+        Seasonal influenza can be prevented by taking a few important steps.
+        Here are some tips to help protect yourself and your community:
+      </p>
+      <ul>
+        <li>
+          <strong>Get Vaccinated:</strong> The flu vaccine is the best defense
+          against seasonal flu. Consult your healthcare provider about getting
+          vaccinated annually.
+        </li>
+        <li>
+          <strong>Practice Good Hygiene:</strong> Wash your hands frequently
+          with soap and water for at least 20 seconds.
+        </li>
+        <li>
+          <strong>Avoid Close Contact:</strong> Stay away from people who are
+          sick, and if you are sick, keep your distance from others.
+        </li>
+        <li>
+          <strong>Cover Your Coughs and Sneezes:</strong> Use a tissue or your
+          elbow to cover your mouth and nose.
+        </li>
+        <li>
+          <strong>Stay Home:</strong> If you feel unwell, avoid going to work or
+          school to prevent spreading the virus.
+        </li>
+      </ul>
+      <p>
+        For more detailed information, visit the{" "}
+        <a
+          href="https://www.cdc.gov/flu/index.htm"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          CDC Flu Information Page
+        </a>
+        .
+      </p>
+    </div>
+  );
+}
+
+// Helper function to map severity to a color
 function getSeverityColor(severity) {
   switch (severity?.toLowerCase()) {
     case "high":
@@ -128,7 +173,7 @@ function getSeverityColor(severity) {
     case "low":
       return "#5cb85c"; // green
     default:
-      return "#777"; // grey if severity not provided
+      return "#777"; // grey if not provided
   }
 }
 
