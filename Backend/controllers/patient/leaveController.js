@@ -1,7 +1,7 @@
 // controllers/patient/leaveController.js
 import LeaveForm from "../../models/LeaveForm.js";
 
-// Get all leave forms for the patient
+// Get all leave forms for the patient (unchanged)
 export const getLeaveForms = async (req, res, next) => {
   try {
     const leaveForms = await LeaveForm.find({ patient: req.user._id }).sort({
@@ -15,18 +15,32 @@ export const getLeaveForms = async (req, res, next) => {
 
 /**
  * Create a new leave form after the file has been stored in GridFS.
- * Instead of using req.file.filename, we use the provided gridFsFileId.
- *
- * This function is intended to be called from your route, after you
- * have streamed the uploaded file into GridFS and obtained its _id.
+ * We now include the additional fields from the front-end form:
+ * symptoms, illnessStartDate, illnessEndDate, severity, consultedDoctor
  */
 export const submitLeaveFormWithGridFS = async (req, gridFsFileId, next) => {
   try {
-    const { reason } = req.body;
+    // Extract new fields plus the existing reason field
+    const {
+      reason,
+      symptoms,
+      illnessStartDate,
+      illnessEndDate,
+      severity,
+      consultedDoctor,
+    } = req.body;
+
+    // Create the leave form document with new fields
     const leaveForm = await LeaveForm.create({
       patient: req.user._id,
       reason,
-      reportFile: gridFsFileId, // Store the GridFS file ID
+      symptoms: symptoms || "",
+      illnessStartDate: illnessStartDate || null,
+      illnessEndDate: illnessEndDate || null,
+      severity: severity || "Mild",
+      consultedDoctor: consultedDoctor === "true" || false,
+      // If a file was uploaded, store the GridFS ID; otherwise keep empty or undefined
+      reportFile: gridFsFileId || "",
       status: "Pending",
     });
     return leaveForm;

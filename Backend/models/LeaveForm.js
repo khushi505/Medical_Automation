@@ -8,13 +8,37 @@ const LeaveFormSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    // The primary reason or title for the leave request
     reason: {
       type: String,
       required: true,
     },
+    // Additional fields
+    symptoms: {
+      type: String,
+      default: "",
+    },
+    illnessStartDate: {
+      type: Date,
+      default: null,
+    },
+    illnessEndDate: {
+      type: Date,
+      default: null,
+    },
+    severity: {
+      type: String,
+      enum: ["Mild", "Moderate", "Severe"],
+      default: "Mild",
+    },
+    consultedDoctor: {
+      type: Boolean,
+      default: false,
+    },
+    // The uploaded medical report file (GridFS file ID or filename)
     reportFile: {
-      type: String, // This could be a filename or GridFS file ID
-      required: true,
+      type: String,
+      required: false, // If the file is optional, make this non-required
     },
     status: {
       type: String,

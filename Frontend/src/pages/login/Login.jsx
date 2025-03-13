@@ -1,15 +1,26 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Login.css";
+import axios from "axios";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Add your login logic here (API call, validations, etc.)
-    console.log("Email:", email, "Password:", password);
+    try {
+      // **API Endpoint** for login
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        { email, password }
+      );
+      console.log("Login successful:", response.data);
+      // Save token (e.g., localStorage.setItem("token", response.data.token)) and navigate to protected route
+    } catch (err) {
+      console.error("Login error:", err.response?.data?.message || err.message);
+      setError(err.response?.data?.message || "Login failed");
+    }
   };
 
   const handleGoogleLogin = () => {

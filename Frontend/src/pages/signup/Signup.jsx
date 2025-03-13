@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./SignUp.css";
+import axios from "axios";
 
 function SignUp() {
   const [name, setName] = useState("");
@@ -13,23 +14,36 @@ function SignUp() {
   const [section, setSection] = useState("");
   const [gender, setGender] = useState("");
   const [contact, setContact] = useState("");
+  const [error, setError] = useState("");
 
   // Handles form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Add sign-up logic (API call, validations, etc.)
-    console.log({
-      name,
-      email,
-      password,
-      role,
-      hostelName,
-      roomNo,
-      branch,
-      section,
-      gender,
-      contact,
-    });
+    try {
+      // **API Endpoint** for signup
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/signup",
+        {
+          name,
+          email,
+          password,
+          hostelName,
+          roomNo,
+          branch,
+          section,
+          gender,
+          contact,
+        }
+      );
+      console.log("Signup successful:", response.data);
+      // Optionally, store token or navigate to login
+    } catch (err) {
+      console.error(
+        "Signup error:",
+        err.response?.data?.message || err.message
+      );
+      setError(err.response?.data?.message || "Signup failed");
+    }
   };
 
   // Handles Google sign-up

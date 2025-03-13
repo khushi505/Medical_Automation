@@ -2,6 +2,7 @@
 import express from "express";
 import connectDB from "./config/db.js";
 import dotenv from "dotenv";
+import cors from "cors";
 
 dotenv.config(); // Load environment variables
 
@@ -13,6 +14,7 @@ const app = express();
 // Middleware to parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 // Import routes
 import authRoutes from "./routes/authRoutes.js";
