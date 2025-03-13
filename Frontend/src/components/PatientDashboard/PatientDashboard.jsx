@@ -109,10 +109,7 @@ function PatientDashboard() {
         {
           appointmentDate,
           details: newAppointment.details,
-          doctorId: newAppointment.doctor,
-          // "doctor" here is just a string from <select>.
-          // If your backend expects an actual doctor _id,
-          // you need to store that ID in newAppointment.doctor instead.
+          doctorId: null,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -125,12 +122,21 @@ function PatientDashboard() {
       alert("Appointment booked successfully!");
 
       // 3) Reset the form
-      setNewAppointment({ doctor: "", date: "", time: "", details: "" });
+      // Map appointmentDate from backend to 'date' for History display
+      const newApt = {
+        ...response.data.appointment,
+        date: response.data.appointment.appointmentDate,
+      };
+      setAppointments((prev) => [...prev, newApt]);
+      alert("Appointment booked successfully!");
+
+      setNewAppointment({ date: "", time: "", details: "" });
     } catch (error) {
       console.error("Error booking appointment:", error);
       alert("Failed to book appointment!");
     }
   };
+
   // Handler to update appointment status (simulated)
   const handleAppointmentAcceptance = (id, status) => {
     setAppointments((prev) =>
@@ -150,6 +156,29 @@ function PatientDashboard() {
   const handleLogout = () => {
     alert("Logging out...");
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios
+        .get("http://localhost:5000/api/patient/appointments", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          // Ensure the appointmentDate is in ISO format by replacing the space with 'T'
+          const fetchedAppointments = response.data.appointments.map((apt) => ({
+            ...apt,
+            date: apt.appointmentDate
+              ? apt.appointmentDate.replace(" ", "T")
+              : apt.date,
+          }));
+          setAppointments(fetchedAppointments);
+        })
+        .catch((error) => {
+          console.error("Error fetching appointments:", error);
+        });
+    }
+  }, []);
 
   return (
     <div className="patient-dashboard-container-new">

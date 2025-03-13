@@ -54,7 +54,7 @@ export const bookAppointment = async (req, res, next) => {
     const appointment = await Appointment.create({
       appointmentId,
       patient: req.user._id,
-      doctor: null, // If doctorId is missing, it remains null
+      doctor: doctorId || null, // If doctorId is missing, it remains null
       appointmentDate,
       details,
       status: "Pending",
