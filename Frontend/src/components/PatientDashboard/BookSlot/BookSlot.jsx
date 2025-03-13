@@ -1,4 +1,6 @@
 import React, { useRef } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./BookSlot.css";
 
 function BookSlot({
@@ -8,17 +10,25 @@ function BookSlot({
   appointments,
   onSimulate,
 }) {
-  // Refs for date input if needed
   const dateInputRef = useRef(null);
+
+  const handleCalendarIconClick = () => {
+    if (dateInputRef.current) {
+      if (typeof dateInputRef.current.showPicker === "function") {
+        dateInputRef.current.showPicker();
+      } else {
+        dateInputRef.current.focus();
+      }
+    }
+  };
 
   return (
     <div className="book-slot-card">
       <h2>Book an Appointment</h2>
       <form onSubmit={onBook} className="book-slot-form">
-        {/* Date Selection */}
         <div className="form-group">
           <label>Date</label>
-          <label className="date-label">
+          <div className="date-input-wrapper">
             <input
               type="date"
               ref={dateInputRef}
@@ -28,11 +38,14 @@ function BookSlot({
               }
               required
             />
-            <span className="date-icon">📅</span>
-          </label>
+            <span
+              className="date-icon"
+              onClick={handleCalendarIconClick}
+              style={{ cursor: "pointer" }}
+            />
+          </div>
         </div>
 
-        {/* Time Selection */}
         <div className="form-group">
           <label>Time</label>
           <input
@@ -45,7 +58,6 @@ function BookSlot({
           />
         </div>
 
-        {/* Details / Symptoms */}
         <div className="form-group">
           <label>Details / Symptoms</label>
           <textarea
@@ -66,6 +78,8 @@ function BookSlot({
         Your appointment request is submitted. Please check the Medical History
         section for updates.
       </p>
+      {/* Keep ToastContainer outside Routes so it's always present */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

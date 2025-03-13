@@ -1,11 +1,25 @@
 import React from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./EditProfile.css";
 
 function EditProfile({ editData, setEditData, onSubmit }) {
+  // Wrap the passed onSubmit handler to show a toast notification on success or error.
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Call the onSubmit prop function (which should update the profile)
+      await onSubmit(e);
+      // toast.success("Profile updated successfully!");
+    } catch (error) {
+      // toast.error("Profile update failed. Please try again.");
+    }
+  };
+
   return (
     <div className="edit-profile-card">
       <h2>Edit Profile</h2>
-      <form onSubmit={onSubmit} className="edit-profile-form">
+      <form onSubmit={handleFormSubmit} className="edit-profile-form">
         <div className="form-group">
           <label>Name</label>
           <input
@@ -78,6 +92,7 @@ function EditProfile({ editData, setEditData, onSubmit }) {
           Save Changes
         </button>
       </form>
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

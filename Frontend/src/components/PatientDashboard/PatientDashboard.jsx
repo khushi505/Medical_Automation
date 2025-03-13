@@ -119,8 +119,6 @@ function PatientDashboard() {
       // 2) Update local state (optional)
       setAppointments((prev) => [...prev, response.data.appointment]);
 
-      alert("Appointment booked successfully!");
-
       // 3) Reset the form
       // Map appointmentDate from backend to 'date' for History display
       const newApt = {
@@ -128,7 +126,7 @@ function PatientDashboard() {
         date: response.data.appointment.appointmentDate,
       };
       setAppointments((prev) => [...prev, newApt]);
-      alert("Appointment booked successfully!");
+      toast.success("Appointment booked successfully!");
 
       setNewAppointment({ date: "", time: "", details: "" });
     } catch (error) {
