@@ -57,8 +57,8 @@ function Login() {
   };
 
   const handleGoogleLogin = () => {
-    console.log("Sign in with Google clicked");
-    toast.info("Google login not implemented yet");
+    // Redirect the browser to the backend endpoint that starts Google OAuth
+    window.location.href = "http://localhost:5000/api/google";
   };
 
   return (

@@ -81,8 +81,8 @@ function SignUp() {
   };
 
   const handleGoogleSignUp = () => {
-    console.log("Sign up with Google clicked");
-    toast.info("Google signup not implemented yet");
+    // Redirect to backend Google OAuth endpoint
+    window.location.href = "http://localhost:5000/api/google";
   };
 
   return (

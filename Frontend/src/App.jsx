@@ -8,6 +8,8 @@ import Signup from "./pages/signup/Signup";
 import DoctorDashboard from "./components/DoctorDashboard/DoctorDashboard";
 import PatientDashboard from "./components/PatientDashboard/PatientDashboard";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
+import GoogleSuccess from "./pages/GoogleSuccess";
+import CompleteProfile from "./pages/CompleteProfile"; // New route for completing profile
 
 function App() {
   return (
@@ -18,7 +20,10 @@ function App() {
         <Route path="/doctor" element={<DoctorDashboard />} />
         <Route path="/patient" element={<PatientDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/google-success" element={<GoogleSuccess />} />
+        <Route path="/complete-profile" element={<CompleteProfile />} />
       </Routes>
+      <ToastContainer position="top-right" autoClose={3000} />
     </Router>
   );
 }
