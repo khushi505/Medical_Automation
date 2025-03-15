@@ -12,6 +12,17 @@ export const getLeaveForms = async (req, res, next) => {
     next(error);
   }
 };
+export const getLeaveStatus = async (req, res, next) => {
+  try {
+    const leaveRequests = await LeaveForm.find({ patient: req.user._id }).sort({
+      createdAt: -1,
+    });
+    // Return the data in whatever shape the front-end expects:
+    res.status(200).json({ leaveRequests });
+  } catch (error) {
+    next(error);
+  }
+};
 
 /**
  * Create a new leave form after the file has been stored in GridFS.

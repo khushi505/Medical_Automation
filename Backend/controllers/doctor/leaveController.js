@@ -15,6 +15,32 @@ export const getAllLeaveForms = async (req, res, next) => {
     next(error);
   }
 };
+export const updateLeaveStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params; // /leave-status/:id
+    const { status } = req.body; // e.g. "Approved", "Rejected", etc.
+
+    const leaveForm = await LeaveForm.findById(id);
+    if (!leaveForm) {
+      return res.status(404).json({ message: "Leave form not found" });
+    }
+
+    // Optionally, check if user is a doctor or admin
+    // if (req.user.role !== "doctor") {
+    //   return res.status(403).json({ message: "Access denied" });
+    // }
+
+    leaveForm.status = status;
+    await leaveForm.save();
+
+    res.status(200).json({
+      message: "Leave status updated successfully",
+      leaveForm,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // Update the status of a leave form (Approve or Reject)
 export const updateLeaveFormStatus = async (req, res, next) => {

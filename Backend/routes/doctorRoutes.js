@@ -19,6 +19,7 @@ router.get("/profile", protect, getDoctorProfile);
 // New Appointments (Pending) & Accept/Reject Actions
 router.get("/appointments/new", protect, getNewAppointments);
 router.post("/appointments/update", protect, updateAppointmentStatus);
+
 // Adding Prescription for an accepted appointment
 router.post("/appointments/prescription", protect, addPrescription);
 

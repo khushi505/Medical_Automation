@@ -10,6 +10,7 @@ import Advisory from "./Advisory/Advisory";
 import LeaveForm from "./LeaveForm/LeaveForm";
 import axios from "axios";
 import { toast } from "react-toastify";
+import LeaveStatus from "./LeaveStatus/LeaveStatus";
 
 function PatientDashboard() {
   // Active tab state
@@ -248,6 +249,7 @@ function PatientDashboard() {
         {activeTab === "history" && <History appointments={appointments} />}
         {activeTab === "advisory" && <Advisory />}
         {activeTab === "contact" && <Contact />}
+        {activeTab === "leave-status" && <LeaveStatus />}
 
         {activeTab === "leave" && (
           <LeaveForm onSubmit={handleLeaveFormSubmit} />

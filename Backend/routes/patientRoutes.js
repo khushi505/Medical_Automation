@@ -14,7 +14,8 @@ import diskUpload from "../config/diskUpload.js"; // our disk storage configurat
 import mongoose from "mongoose";
 import fs from "fs";
 import { GridFSBucket } from "mongodb";
-import User from "../models/User.js"; // NEW: Import User model for additional endpoints
+import User from "../models/User.js";
+import { getLeaveStatus } from "../controllers/patient/leaveController.js"; // NEW: Import User model for additional endpoints
 
 const router = express.Router();
 const upload = diskUpload;
@@ -102,7 +103,7 @@ router.get("/me", protect, async (req, res, next) => {
     next(err);
   }
 });
-
+router.get("/leave-status", protect, getLeaveStatus);
 // PUT /api/patient/complete-profile - Update additional profile fields
 router.put("/complete-profile", protect, async (req, res, next) => {
   try {

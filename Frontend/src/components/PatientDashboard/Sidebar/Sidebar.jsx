@@ -59,6 +59,13 @@ function Sidebar({ activeTab, setActiveTab, onLogout }) {
           </li>
 
           <li
+            className={activeTab === "leave-status" ? "active" : ""}
+            onClick={() => handleItemClick("leave-status")}
+          >
+            Leave Status
+          </li>
+
+          <li
             className={activeTab === "contact" ? "active" : ""}
             onClick={() => handleItemClick("contact")}
           >
