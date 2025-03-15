@@ -1,4 +1,3 @@
-// models/Prescription.js
 import mongoose from "mongoose";
 
 const PrescriptionSchema = new mongoose.Schema(
@@ -12,7 +11,7 @@ const PrescriptionSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    prescriptionText: {
+    prescription: {
       type: String,
       required: true,
     },

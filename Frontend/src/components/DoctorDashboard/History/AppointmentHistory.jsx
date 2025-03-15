@@ -1,39 +1,9 @@
-import React, { useState, useEffect } from "react";
+// AppointmentHistory.jsx
+import React from "react";
 import "./AppointmentHistory.css";
 
-function AppointmentHistory() {
-  const [appointments, setAppointments] = useState([
-    {
-      id: 1,
-      patientName: "Alice Smith",
-      date: "2025-03-12",
-      time: "10:00 AM",
-      symptoms: "Fever, cough",
-      prescription: "Paracetamol 500mg",
-    },
-    {
-      id: 2,
-      patientName: "Bob Johnson",
-      date: "2025-03-12",
-      time: "11:30 AM",
-      symptoms: "Headache, sore throat",
-      prescription: "",
-    },
-    {
-      id: 3,
-      patientName: "Charlie Brown",
-      date: "2025-03-11",
-      time: "09:45 AM",
-      symptoms: "Stomach ache",
-      prescription: "Antacid, IV fluids",
-    },
-  ]);
-
-  useEffect(() => {
-    // TODO: Replace with real fetch from backend
-  }, []);
-
-  // Helper to format from YYYY-MM-DD => dd-mm-yyyy
+function AppointmentHistory({ appointments }) {
+  // Helper to format a date string as dd-mm-yyyy
   const formatDate = (dateString) => {
     const d = new Date(dateString);
     let dd = d.getDate();
@@ -44,9 +14,9 @@ function AppointmentHistory() {
     return `${dd}-${mm}-${yyyy}`;
   };
 
-  // Group by date
-  const grouped = appointments.reduce((acc, apt) => {
-    const dateKey = formatDate(apt.date);
+  // Group appointments by formatted date
+  const groupedAppointments = appointments.reduce((acc, apt) => {
+    const dateKey = formatDate(apt.appointmentDate || apt.date);
     if (!acc[dateKey]) {
       acc[dateKey] = [];
     }
@@ -54,8 +24,8 @@ function AppointmentHistory() {
     return acc;
   }, {});
 
-  // Sort the dates descending
-  const sortedDates = Object.keys(grouped).sort((a, b) => {
+  // Sort the dates in descending order (latest first)
+  const sortedDates = Object.keys(groupedAppointments).sort((a, b) => {
     const [da, ma, ya] = a.split("-");
     const [db, mb, yb] = b.split("-");
     const dateA = new Date(`${ya}-${ma}-${da}`);
@@ -65,29 +35,47 @@ function AppointmentHistory() {
 
   return (
     <div className="appointment-history-section">
-      <h2>Appointment History</h2>
+      <h2>Doctor Appointment History</h2>
       {sortedDates.length > 0 ? (
         sortedDates.map((dateKey) => (
           <div key={dateKey} className="appointment-date-group">
             <h3 className="date-heading">{dateKey}</h3>
             <div className="appointment-cards-group">
-              {grouped[dateKey].map((apt) => (
-                <div key={apt.id} className="appointment-history-card">
-                  <p>
-                    <strong>Patient Name:</strong> {apt.patientName}
-                  </p>
-                  <p>
-                    <strong>Time:</strong> {apt.time}
-                  </p>
-                  <p>
-                    <strong>Symptoms:</strong> {apt.symptoms}
-                  </p>
-                  <p>
-                    <strong>Prescription:</strong>{" "}
-                    {apt.prescription || "Not Provided"}
-                  </p>
-                </div>
-              ))}
+              {groupedAppointments[dateKey].map((apt) => {
+                // Convert the appointmentDate to a local time
+                const timeString = apt.appointmentDate
+                  ? new Date(apt.appointmentDate).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "N/A";
+
+                // If .populate("prescription") was done on the backend,
+                // apt.prescription is an object with "prescription" text
+                const prescriptionText =
+                  apt.prescription?.prescription || "Not Provided";
+
+                return (
+                  <div
+                    key={apt.appointmentId || apt._id}
+                    className="appointment-history-card"
+                  >
+                    <p>
+                      <strong>Patient Name:</strong>{" "}
+                      {apt.patient?.name || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Time:</strong> {timeString}
+                    </p>
+                    <p>
+                      <strong>Status:</strong> {apt.status}
+                    </p>
+                    <p>
+                      <strong>Prescription:</strong> {prescriptionText}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         ))

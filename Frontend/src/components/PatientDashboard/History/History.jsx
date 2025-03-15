@@ -32,20 +32,27 @@ function History({ appointments, onRevisit }) {
       {recentAppointments.length > 0 ? (
         <div className="history-grid">
           {recentAppointments.map((apt) => {
+            // Use appointmentId if available, otherwise fallback to _id for the unique key
+            const key = apt.appointmentId || apt._id;
             // Convert the ISO date to a human-readable format
             const dateObj = new Date(apt.date);
             const readableDate = dateObj.toLocaleString("en-US", {
               dateStyle: "medium",
               timeStyle: "short",
             });
+            // If doctor is an object, display its name; otherwise display doctor directly
+            const doctorName =
+              apt.doctor && typeof apt.doctor === "object"
+                ? apt.doctor.name
+                : apt.doctor || "Not assigned";
 
             return (
-              <div key={apt.id} className="history-card">
+              <div key={key} className="history-card">
                 <p>
                   <strong>Date:</strong> {readableDate}
                 </p>
                 <p>
-                  <strong>Doctor:</strong> {apt.doctor || "Not assigned"}
+                  <strong>Doctor:</strong> {doctorName}
                 </p>
                 <p>
                   <strong>Symptoms:</strong> {apt.details}
@@ -57,7 +64,7 @@ function History({ appointments, onRevisit }) {
                 {apt.status === "Accepted" && (
                   <button
                     className="revisit-btn"
-                    onClick={() => handleRevisit(apt.id)}
+                    onClick={() => handleRevisit(key)}
                   >
                     Revisit
                   </button>
