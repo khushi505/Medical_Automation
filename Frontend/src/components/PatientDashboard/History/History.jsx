@@ -8,7 +8,7 @@ function History({ appointments, onRevisit }) {
 
   // Filter appointments within the last 4 months
   const recentAppointments = appointments.filter((apt) => {
-    const aptDate = new Date(apt.date);
+    const aptDate = new Date(apt.appointmentDate || apt.date);
     return aptDate >= fourMonthsAgo;
   });
 
@@ -35,16 +35,27 @@ function History({ appointments, onRevisit }) {
             // Use appointmentId if available, otherwise fallback to _id for the unique key
             const key = apt.appointmentId || apt._id;
             // Convert the ISO date to a human-readable format
-            const dateObj = new Date(apt.date);
+            const dateObj = new Date(apt.appointmentDate || apt.date);
             const readableDate = dateObj.toLocaleString("en-US", {
               dateStyle: "medium",
               timeStyle: "short",
             });
-            // If doctor is an object, display its name; otherwise display doctor directly
+
+            // Ensure doctor is displayed properly
             const doctorName =
               apt.doctor && typeof apt.doctor === "object"
                 ? apt.doctor.name
                 : apt.doctor || "Not assigned";
+
+            // Ensure prescription is displayed properly (support multiple prescriptions)
+            const prescriptions =
+              Array.isArray(apt.prescriptions) && apt.prescriptions.length > 0
+                ? apt.prescriptions.map((p, idx) => (
+                    <span key={idx} className="prescription-item">
+                      {p.prescription}
+                    </span>
+                  ))
+                : "Not provided yet";
 
             return (
               <div key={key} className="history-card">
@@ -58,8 +69,7 @@ function History({ appointments, onRevisit }) {
                   <strong>Symptoms:</strong> {apt.details}
                 </p>
                 <p>
-                  <strong>Prescription:</strong>{" "}
-                  {apt.prescription || "Not provided yet"}
+                  <strong>Prescription:</strong> {prescriptions}
                 </p>
                 {apt.status === "Accepted" && (
                   <button

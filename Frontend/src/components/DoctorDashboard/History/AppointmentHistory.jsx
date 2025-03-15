@@ -1,4 +1,4 @@
-// AppointmentHistory.jsx
+// frontend/AppointmentHistory.jsx
 import React from "react";
 import "./AppointmentHistory.css";
 
@@ -50,10 +50,16 @@ function AppointmentHistory({ appointments }) {
                     })
                   : "N/A";
 
-                // If .populate("prescription") was done on the backend,
-                // apt.prescription is an object with "prescription" text
-                const prescriptionText =
-                  apt.prescription?.prescription || "Not Provided";
+                // Ensure prescription is an array (support multiple prescriptions)
+                const prescriptions =
+                  Array.isArray(apt.prescriptions) &&
+                  apt.prescriptions.length > 0
+                    ? apt.prescriptions.map((p, idx) => (
+                        <span key={idx} className="prescription-item">
+                          {p.prescription}
+                        </span>
+                      ))
+                    : "Not Provided";
 
                 return (
                   <div
@@ -71,7 +77,7 @@ function AppointmentHistory({ appointments }) {
                       <strong>Status:</strong> {apt.status}
                     </p>
                     <p>
-                      <strong>Prescription:</strong> {prescriptionText}
+                      <strong>Prescription:</strong> {prescriptions}
                     </p>
                   </div>
                 );
