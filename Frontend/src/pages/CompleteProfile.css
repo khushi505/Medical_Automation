@@ -11,11 +11,11 @@
 }
 
 /* Reset */
-* {
+/* * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
+} */
 
 /* Body to show a subtle background and center content */
 body {
