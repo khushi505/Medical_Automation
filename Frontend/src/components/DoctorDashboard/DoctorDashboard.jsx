@@ -177,36 +177,65 @@ function DoctorDashboard() {
   };
 
   // Handler: Add prescription and finalize acceptance
-  const handleAddPrescription = async (appointmentId) => {
+
+  const handleAddPrescription = async (appointment) => {
     const token = localStorage.getItem("token");
     if (!token) return;
+
+    console.log("Selected appointment object:", appointment); // ✅ Debugging step
+
+    const appointmentId = appointment?.appointmentId; // ✅ Ensure correct ID is used
+    const prescriptionText = prescriptions[appointmentId]; // ✅ Retrieve prescription text
+
+    console.log("Extracted appointmentId:", appointmentId); // ✅ Debugging step
+    console.log("Extracted prescriptionText:", prescriptionText); // ✅ Debugging step
+
+    if (!appointmentId || !prescriptionText) {
+      toast.error("Missing appointment ID or prescription text.");
+      console.error("Error: Missing appointmentId or prescriptionText", {
+        appointmentId,
+        prescriptionText,
+      });
+      return;
+    }
+
     try {
-      const prescriptionText = prescriptions[appointmentId];
-      await axios.post(
+      console.log("Sending prescription request:", {
+        appointmentId,
+        prescriptionText,
+      });
+
+      const response = await axios.post(
         "http://localhost:5000/api/doctor/appointments/prescription",
-        { appointmentId, prescription: prescriptionText },
+        { appointmentId, prescriptionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Prescription added; appointment finalized as accepted");
 
-      // Remove the appointment from pending list
+      console.log("Prescription added successfully:", response.data);
+      toast.success("Prescription added successfully!");
+
+      // ✅ Remove the appointment from pending list
       setAppointments((prev) =>
         prev.filter((apt) => apt.appointmentId !== appointmentId)
       );
 
-      // Clear prescription input for that appointment
+      // ✅ Clear prescription input for that appointment
       setPrescriptions((prev) => {
         const newPrescriptions = { ...prev };
         delete newPrescriptions[appointmentId];
         return newPrescriptions;
       });
+
       setSelectedAppointment(null);
 
-      // Re-fetch history so that accepted w/ prescription shows up
+      // ✅ Refresh appointment history
       fetchAppointmentHistory();
     } catch (error) {
-      console.error("Error adding prescription:", error);
-      toast.error("Failed to add prescription");
+      console.error(
+        "Error adding prescription:",
+        error.response?.data || error.message
+      );
+      toast.error("Failed to add prescription. Please check logs.");
     }
   };
 

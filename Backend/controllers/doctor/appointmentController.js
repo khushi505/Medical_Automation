@@ -1,11 +1,17 @@
 import Appointment from "../../models/Appointment.js";
 import Prescription from "../../models/Prescription.js"; // Import Prescription Model
+import mongoose from "mongoose";
 
 // ✅ Get new (pending) appointments for the logged-in doctor
 export const getNewAppointments = async (req, res, next) => {
   try {
     const appointments = await Appointment.find({ status: "Pending" })
       .populate("patient", "name email") // Get patient name and email
+      .populate({
+        path: "prescription",
+        select: "prescriptionText doctor",
+        options: { strictPopulate: false }, // Avoid errors if prescription does not exist
+      })
       .sort({ createdAt: -1 });
 
     res.status(200).json({ appointments });
@@ -54,46 +60,68 @@ export const updateAppointmentStatus = async (req, res, next) => {
 };
 
 // ✅ Add a prescription to an accepted appointment
-export const addPrescription = async (req, res, next) => {
+export const addPrescription = async (req, res) => {
   try {
-    const { appointmentId, prescription } = req.body;
+    console.log("Incoming prescription request:", req.body); // ✅ Log request data
 
-    if (!appointmentId || !prescription) {
+    let { appointmentId, prescriptionText } = req.body;
+
+    // ✅ Validate request fields
+    if (!appointmentId || !prescriptionText) {
+      console.error("Missing fields:", { appointmentId, prescriptionText });
       return res
         .status(400)
-        .json({ message: "Missing appointmentId or prescription" });
+        .json({ message: "Missing appointmentId or prescription text" });
     }
 
-    // Ensure the appointment is accepted before adding a prescription
+    if (typeof appointmentId === "object") {
+      console.error(
+        "❌ appointmentId should be a string but got object:",
+        appointmentId
+      );
+      return res
+        .status(400)
+        .json({ message: "Invalid appointment ID format, expected a string." });
+    }
+
+    // ✅ Ensure the appointment exists and has been accepted
     const appointment = await Appointment.findOne({
       appointmentId,
       status: "Accepted",
-    });
+    }).populate("patient", "name _id");
 
     if (!appointment) {
+      console.error("Appointment not found or not accepted:", appointmentId);
       return res
         .status(400)
         .json({ message: "Only accepted appointments can have prescriptions" });
     }
 
-    // Save prescription in the database
-    const prescriptionDoc = await Prescription.create({
+    // ✅ Create a new prescription entry
+    const prescription = await Prescription.create({
       appointmentId,
+      patient: appointment.patient._id,
       doctor: req.user._id,
-      prescription,
+      prescription: prescriptionText,
     });
 
-    // Update appointment with prescription reference
+    if (!prescription._id) {
+      return res
+        .status(500)
+        .json({ message: "Invalid prescription ObjectId generated" });
+    }
+
+    // ✅ Update the Appointment with the Prescription reference
     await Appointment.findOneAndUpdate(
       { appointmentId },
-      { prescription: prescriptionDoc.prescription },
+      { prescription: prescription._id },
       { new: true }
     );
 
-    res.status(201).json({
-      message: "Prescription added successfully",
-      prescription: prescriptionDoc,
-    });
+    console.log("Prescription added successfully:", prescription);
+    res
+      .status(201)
+      .json({ message: "Prescription added successfully", prescription });
   } catch (error) {
     console.error("Error adding prescription:", error);
     res.status(500).json({ message: "Server error while adding prescription" });

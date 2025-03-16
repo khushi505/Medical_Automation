@@ -69,7 +69,7 @@ function DoctorAppointments({
                       />
                       <button
                         className="add-prescription-btn-doctor"
-                        onClick={() => onAddPrescription(apt.appointmentId)}
+                        onClick={() => onAddPrescription(apt)}
                       >
                         Add Prescription
                       </button>

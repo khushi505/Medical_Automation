@@ -30,6 +30,11 @@ const AppointmentSchema = new mongoose.Schema(
       enum: ["Pending", "Accepted", "Rejected"],
       default: "Pending",
     },
+    prescription: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Prescription",
+      default: null,
+    }, // ✅ Ensure ObjectId reference// ✅ Important for cross-mapping prescriptions
   },
 
   { timestamps: true }

@@ -8,6 +8,11 @@ export const getAppointmentHistory = async (req, res, next) => {
     // Fetch all appointments for the logged-in doctor (both current and historical)
     const currentAppointments = await Appointment.find({ doctor: req.user._id })
       .populate("patient", "name email")
+      .populate({
+        path: "prescription",
+        select: "prescriptionText doctor",
+        options: { strictPopulate: false },
+      })
       .sort({ createdAt: -1 });
 
     const historicalAppointments = await HistoryAppointment.find({
