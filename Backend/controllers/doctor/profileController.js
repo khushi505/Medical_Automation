@@ -1,20 +1,23 @@
 // controllers/doctor/profileController.js
-import User from "../../models/User.js";
 
+// Hardcoded Doctor Details (No Database Used)
 const DOCTOR_DETAILS = {
   "venkataabhinay.t@srmap.edu.in": {
+    name: "Dr. Venkata Abhinay",
     experience: "5 years",
     specialization: "General Medicine",
     workingDays: "Mon - Fri",
     timeSlot: "9 AM - 5 PM",
   },
   "sabeehafarheen.s@srmap.edu.in": {
+    name: "Dr. Sabeeha Farheen",
     experience: "3 years",
     specialization: "Pediatrics",
     workingDays: "Mon - Sat",
     timeSlot: "10 AM - 4 PM",
   },
   "raju.du@srmap.edu.in": {
+    name: "Dr. Raju Du",
     experience: "7 years",
     specialization: "Orthopedics",
     workingDays: "Mon - Thurs",
@@ -22,24 +25,19 @@ const DOCTOR_DETAILS = {
   },
 };
 
+// Fetch Doctor Profile Directly from Hardcoded Data (No Database Required)
 export const getDoctorProfile = async (req, res, next) => {
   try {
-    // req.user is set by the auth middleware
-    const doctor = req.user; // from the DB (name, email, role, etc.)
+    const email = req.user.email; // Extract doctor’s email from request
 
-    // If the doctor's email is in our dictionary, merge the extra details
-    const extra = DOCTOR_DETAILS[doctor.email] || {};
+    // Fetch doctor details from hardcoded object
+    const doctorProfile = DOCTOR_DETAILS[email];
 
-    // Merge the user doc with the extra fields
-    const augmentedDoctor = {
-      ...doctor.toObject(), // if doctor is a Mongoose doc, convert it
-      experience: extra.experience || "",
-      specialization: extra.specialization || "",
-      workingDays: extra.workingDays || "",
-      timeSlot: extra.timeSlot || "",
-    };
+    if (!doctorProfile) {
+      return res.status(404).json({ message: "Doctor profile not found" });
+    }
 
-    res.status(200).json({ doctor: augmentedDoctor });
+    res.status(200).json({ doctor: doctorProfile });
   } catch (error) {
     next(error);
   }

@@ -3,6 +3,7 @@ import User from "../../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { validateEmail } from "../../utils/emailValidator.js";
+// import profileController from "../doctor/profileController.js";
 
 // Array of fixed doctor emails (all in lowercase)
 const allowedDoctorEmails = [

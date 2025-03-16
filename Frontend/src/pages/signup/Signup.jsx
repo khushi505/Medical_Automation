@@ -22,12 +22,9 @@ function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Trim and lowercase the email
     const trimmedEmail = email.trim().toLowerCase();
     if (!trimmedEmail.endsWith("@srmap.edu.in")) {
-      const errMsg = "You must use your srmap.edu.in email address.";
-      setError(errMsg);
-      toast.error(errMsg);
+      toast.error("You must use your srmap.edu.in email address.");
       return;
     }
 
@@ -47,26 +44,26 @@ function SignUp() {
           contact,
         }
       );
+
       console.log("Signup response:", response.data);
       toast.success("Signup successful!");
 
-      // Check if user data with role is returned
-      const userData = response.data.user;
-      if (!userData || !userData.role) {
+      const { token, user } = response.data;
+
+      if (!token || !user || !user.role) {
         toast.error(
-          "Signup successful, but user role is missing. Redirecting to login."
+          "Signup successful, but role is missing. Redirecting to login."
         );
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
+        setTimeout(() => navigate("/login"), 2000);
         return;
       }
 
-      // Delay redirection to allow toast visibility
+      // ✅ Store token in local storage (Fixes blank profile issue)
+      localStorage.setItem("token", token);
+
+      // ✅ Redirect based on role (After storing token)
       setTimeout(() => {
-        if (userData.role === "student") {
-          navigate("/patient");
-        } else if (userData.role === "doctor") {
+        if (user.role === "doctor") {
           navigate("/doctor");
         } else {
           navigate("/patient");
