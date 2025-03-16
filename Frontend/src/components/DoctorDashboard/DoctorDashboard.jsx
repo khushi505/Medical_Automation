@@ -120,15 +120,20 @@ function DoctorDashboard() {
   const handleAccept = async (appointmentId) => {
     const token = localStorage.getItem("token");
     if (!token) return;
+
     try {
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:5000/api/doctor/appointments/update",
         { appointmentId, status: "Accepted" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Appointment accepted");
 
-      // Mark appointment as accepted so that prescription input can be shown
+      if (response.status === 200) {
+        toast.success(" Appointment accepted successfully!");
+      } else {
+        toast.error(" Failed to accept appointment.");
+      }
+
       setAppointments((prev) =>
         prev.map((apt) =>
           apt.appointmentId === appointmentId
@@ -139,7 +144,7 @@ function DoctorDashboard() {
       setSelectedAppointment(appointmentId);
     } catch (error) {
       console.error("Error accepting appointment:", error);
-      toast.error("Failed to accept appointment");
+      toast.error("❌ Failed to accept appointment.");
     }
   };
 
@@ -178,7 +183,7 @@ function DoctorDashboard() {
     const prescriptionText = prescriptions[appointmentId];
 
     if (!appointmentId || !prescriptionText) {
-      toast.error("Missing appointment ID or prescription text.");
+      toast.error(" Missing appointment ID or prescription text.");
       return;
     }
 
@@ -189,14 +194,18 @@ function DoctorDashboard() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success("Prescription added successfully!");
+      if (response.status === 201) {
+        toast.success(" Prescription added successfully!");
+      } else {
+        toast.error(" Failed to add prescription.");
+      }
 
-      // ✅ Remove the appointment from pending list
+      // Remove the appointment from pending list
       setAppointments((prev) =>
         prev.filter((apt) => apt.appointmentId !== appointmentId)
       );
 
-      // ✅ Clear prescription input
+      // Clear prescription input
       setPrescriptions((prev) => {
         const newPrescriptions = { ...prev };
         delete newPrescriptions[appointmentId];
@@ -205,11 +214,11 @@ function DoctorDashboard() {
 
       setSelectedAppointment(null);
 
-      // ✅ Refresh appointment history
+      // Refresh appointment history
       fetchAppointmentHistory();
     } catch (error) {
       console.error("Error adding prescription:", error);
-      toast.error("Failed to add prescription.");
+      toast.error("❌ Failed to add prescription.");
     }
   };
 
