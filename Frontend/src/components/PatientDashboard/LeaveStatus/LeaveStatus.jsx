@@ -6,6 +6,12 @@ import "./LeaveStatus.css";
 function LeaveStatus() {
   const [leaveRequests, setLeaveRequests] = useState([]);
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A"; // Handle empty date case
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB"); // Formats as "dd/mm/yyyy"
+  };
+
   useEffect(() => {
     const fetchLeaveStatus = async () => {
       try {
@@ -38,14 +44,8 @@ function LeaveStatus() {
                 <strong>Reason:</strong> {req.reason}
               </p>
               <p>
-                <strong>Duration:</strong>{" "}
-                {req.illnessStartDate
-                  ? new Date(req.illnessStartDate).toLocaleDateString()
-                  : "N/A"}{" "}
-                to{" "}
-                {req.illnessEndDate
-                  ? new Date(req.illnessEndDate).toLocaleDateString()
-                  : "N/A"}
+                <strong>Duration:</strong> {formatDate(req.illnessStartDate)} to{" "}
+                {formatDate(req.illnessEndDate)}
               </p>
               <p>
                 <strong>Status:</strong> {req.status}

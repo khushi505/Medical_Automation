@@ -7,6 +7,12 @@ import "./DoctorLeaveApproval.css";
 function DoctorLeaveApproval() {
   const [leaveRequests, setLeaveRequests] = useState([]);
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A"; // Handle empty date case
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB"); // Formats as "dd/mm/yyyy"
+  };
+
   useEffect(() => {
     fetchLeaveRequests();
   }, []);
@@ -74,10 +80,11 @@ function DoctorLeaveApproval() {
               </p>
               <p>
                 <strong>Illness Start Date:</strong>{" "}
-                {req.illnessStartDate || "N/A"}
+                {formatDate(req.illnessStartDate)}
               </p>
               <p>
-                <strong>Illness End Date:</strong> {req.illnessEndDate || "N/A"}
+                <strong>Illness End Date:</strong>{" "}
+                {formatDate(req.illnessEndDate)}
               </p>
               <p>
                 <strong>Severity:</strong> {req.severity}
