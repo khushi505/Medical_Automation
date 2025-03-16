@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import DoctorSidebar from "./DoctorSidebar/DoctorSidebar";
 import DoctorProfile from "./DoctorProfile/DoctorProfile";
-import DoctorAppointments from "./Appointments/DoctorAppointments"; // UI-only component
+import DoctorAppointments from "./Appointments/DoctorAppointments";
 import AppointmentHistory from "./History/AppointmentHistory";
 import DoctorLeaveApproval from "./LeaveApproval/DoctorLeaveApproval";
 import Contact from "./Conatact/Contactsrm";
@@ -21,33 +21,33 @@ function DoctorDashboard() {
     timeSlot: "",
   });
 
-  // State for appointment statistics (optional)
+  // State for appointment statistics
   const [statsData, setStatsData] = useState({
     totalAppointments: 0,
     acceptedAppointments: 0,
     pendingAppointments: 0,
   });
 
-  // Pending appointments
+  // State for pending appointments and prescription handling
   const [appointments, setAppointments] = useState([]);
-  const [prescriptions, setPrescriptions] = useState({}); // For prescription text, keyed by appointmentId
+  const [prescriptions, setPrescriptions] = useState({});
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
-  // Appointment history
+  // State for appointment history
   const [historyAppointments, setHistoryAppointments] = useState([]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     toast.info("Logged out successfully.");
-    window.location.href = "/login"; // Redirect to login page
+    window.location.href = "/login";
   };
 
-  // Fetch doctor profile on mount
+  // ✅ Fetch doctor profile on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       toast.error("Session expired. Please log in again.");
-      handleLogout(); // Redirect user or clear session
+      handleLogout();
       return;
     }
 
@@ -64,7 +64,6 @@ function DoctorDashboard() {
           workingDays: doctor.workingDays || "",
           timeSlot: doctor.timeSlot || "",
         });
-        // Optionally update statsData if you have a stats endpoint or placeholders
         setStatsData({
           totalAppointments: 10,
           acceptedAppointments: 6,
@@ -76,7 +75,7 @@ function DoctorDashboard() {
       });
   }, []);
 
-  // Fetch pending appointments on mount
+  // ✅ Fetch pending appointments on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -94,10 +93,11 @@ function DoctorDashboard() {
       });
   }, []);
 
-  // Function to fetch appointment history
+  // ✅ Function to fetch appointment history
   const fetchAppointmentHistory = () => {
     const token = localStorage.getItem("token");
     if (!token) return;
+
     axios
       .get("http://localhost:5000/api/doctor/appointments/history", {
         headers: { Authorization: `Bearer ${token}` },
@@ -111,12 +111,12 @@ function DoctorDashboard() {
       });
   };
 
-  // Fetch appointment history on mount
+  // ✅ Fetch appointment history on mount
   useEffect(() => {
-    fetchAppointmentHistory(); // loads doctor history initially
+    fetchAppointmentHistory();
   }, [appointments]);
 
-  // Handler: Accept an appointment
+  // ✅ Handler: Accept an appointment
   const handleAccept = async (appointmentId) => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -137,16 +137,13 @@ function DoctorDashboard() {
         )
       );
       setSelectedAppointment(appointmentId);
-
-      // Re-fetch history so it appears in the doctor's history tab
-      fetchAppointmentHistory();
     } catch (error) {
       console.error("Error accepting appointment:", error);
       toast.error("Failed to accept appointment");
     }
   };
 
-  // Handler: Reject an appointment
+  // ✅ Handler: Reject an appointment
   const handleReject = async (appointmentId) => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -158,60 +155,40 @@ function DoctorDashboard() {
       );
       toast.success("Appointment rejected");
 
-      // Remove appointment from pending list
       setAppointments((prev) =>
         prev.filter((apt) => apt.appointmentId !== appointmentId)
       );
-
-      // Re-fetch history so the newly rejected appointment is in history
-      fetchAppointmentHistory();
     } catch (error) {
       console.error("Error rejecting appointment:", error);
       toast.error("Failed to reject appointment");
     }
   };
 
-  // Handler: Prescription change for a given appointment
+  // ✅ Handler: Prescription change for a given appointment
   const handlePrescriptionChange = (appointmentId, value) => {
     setPrescriptions((prev) => ({ ...prev, [appointmentId]: value }));
   };
 
-  // Handler: Add prescription and finalize acceptance
-
+  // ✅ Handler: Add prescription and finalize acceptance
   const handleAddPrescription = async (appointment) => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    console.log("Selected appointment object:", appointment); // ✅ Debugging step
-
-    const appointmentId = appointment?.appointmentId; // ✅ Ensure correct ID is used
-    const prescriptionText = prescriptions[appointmentId]; // ✅ Retrieve prescription text
-
-    console.log("Extracted appointmentId:", appointmentId); // ✅ Debugging step
-    console.log("Extracted prescriptionText:", prescriptionText); // ✅ Debugging step
+    const appointmentId = appointment?.appointmentId;
+    const prescriptionText = prescriptions[appointmentId];
 
     if (!appointmentId || !prescriptionText) {
       toast.error("Missing appointment ID or prescription text.");
-      console.error("Error: Missing appointmentId or prescriptionText", {
-        appointmentId,
-        prescriptionText,
-      });
       return;
     }
 
     try {
-      console.log("Sending prescription request:", {
-        appointmentId,
-        prescriptionText,
-      });
-
       const response = await axios.post(
         "http://localhost:5000/api/doctor/appointments/prescription",
         { appointmentId, prescriptionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log("Prescription added successfully:", response.data);
       toast.success("Prescription added successfully!");
 
       // ✅ Remove the appointment from pending list
@@ -219,7 +196,7 @@ function DoctorDashboard() {
         prev.filter((apt) => apt.appointmentId !== appointmentId)
       );
 
-      // ✅ Clear prescription input for that appointment
+      // ✅ Clear prescription input
       setPrescriptions((prev) => {
         const newPrescriptions = { ...prev };
         delete newPrescriptions[appointmentId];
@@ -231,11 +208,8 @@ function DoctorDashboard() {
       // ✅ Refresh appointment history
       fetchAppointmentHistory();
     } catch (error) {
-      console.error(
-        "Error adding prescription:",
-        error.response?.data || error.message
-      );
-      toast.error("Failed to add prescription. Please check logs.");
+      console.error("Error adding prescription:", error);
+      toast.error("Failed to add prescription.");
     }
   };
 

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify"; // ✅ Import toast
+import "react-toastify/dist/ReactToastify.css"; // ✅ Ensure toast styles are loaded
 import "./DoctorLeaveApproval.css";
 
 function DoctorLeaveApproval() {
@@ -21,19 +23,28 @@ function DoctorLeaveApproval() {
       setLeaveRequests(response.data.leaveForms || []);
     } catch (error) {
       console.error("Error fetching doctor leave forms:", error);
+      toast.error("Failed to fetch leave requests.");
     }
   };
 
   const handleUpdateStatus = async (leaveId, newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:5000/api/doctor/leave-forms/update",
-        { leaveFormId: leaveId, status: newStatus }, // Use 'leaveFormId'
+        { leaveFormId: leaveId, status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Update the local state to reflect the new status
+      console.log("Leave approval response:", response.data); // ✅ Debugging log
+
+      if (response.status === 200) {
+        toast.success(`Leave request ${newStatus.toLowerCase()} successfully.`);
+      } else {
+        toast.error(`Unexpected response: ${response.statusText}`);
+      }
+
+      // Update the UI to reflect the new status
       setLeaveRequests((prev) =>
         prev.map((req) =>
           req._id === leaveId ? { ...req, status: newStatus } : req
@@ -41,6 +52,7 @@ function DoctorLeaveApproval() {
       );
     } catch (error) {
       console.error("Error updating leave request:", error);
+      toast.error("Failed to update leave request.");
     }
   };
 
