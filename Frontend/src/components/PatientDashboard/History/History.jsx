@@ -41,20 +41,16 @@ function History({ appointments, onRevisit }) {
               timeStyle: "short",
             });
 
-            // Ensure doctor is displayed properly
+            // ✅ Ensure doctor is displayed properly
             const doctorName =
               apt.doctor && typeof apt.doctor === "object"
                 ? apt.doctor.name
-                : apt.doctor || "Not assigned";
+                : "Not assigned";
 
-            // Ensure prescription is displayed properly (support multiple prescriptions)
-            const prescriptions =
-              Array.isArray(apt.prescriptions) && apt.prescriptions.length > 0
-                ? apt.prescriptions.map((p, idx) => (
-                    <span key={idx} className="prescription-item">
-                      {p.prescription}
-                    </span>
-                  ))
+            // ✅ Fix: Ensure prescription is displayed properly
+            const prescriptionText =
+              apt.prescription && apt.prescription.prescription
+                ? apt.prescription.prescription
                 : "Not provided yet";
 
             return (
@@ -69,7 +65,7 @@ function History({ appointments, onRevisit }) {
                   <strong>Symptoms:</strong> {apt.details}
                 </p>
                 <p>
-                  <strong>Prescription:</strong> {prescriptions}
+                  <strong>Prescription:</strong> {prescriptionText}
                 </p>
                 {apt.status === "Accepted" && (
                   <button

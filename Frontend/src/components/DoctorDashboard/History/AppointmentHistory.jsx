@@ -1,4 +1,3 @@
-// frontend/AppointmentHistory.jsx
 import React from "react";
 import "./AppointmentHistory.css";
 
@@ -50,15 +49,10 @@ function AppointmentHistory({ appointments }) {
                     })
                   : "N/A";
 
-                // Ensure prescription is an array (support multiple prescriptions)
-                const prescriptions =
-                  Array.isArray(apt.prescriptions) &&
-                  apt.prescriptions.length > 0
-                    ? apt.prescriptions.map((p, idx) => (
-                        <span key={idx} className="prescription-item">
-                          {p.prescription}
-                        </span>
-                      ))
+                // ✅ Fix: Ensure prescription is displayed correctly
+                const prescriptionText =
+                  apt.prescription && apt.prescription.prescription
+                    ? apt.prescription.prescription
                     : "Not Provided";
 
                 return (
@@ -77,7 +71,7 @@ function AppointmentHistory({ appointments }) {
                       <strong>Status:</strong> {apt.status}
                     </p>
                     <p>
-                      <strong>Prescription:</strong> {prescriptions}
+                      <strong>Prescription:</strong> {prescriptionText}
                     </p>
                   </div>
                 );

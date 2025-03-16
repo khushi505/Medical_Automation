@@ -7,15 +7,16 @@ import mongoose from "mongoose";
 // ✅ Get all appointments (including history) for the patient
 export const getAppointments = async (req, res) => {
   try {
-    // 1. Fetch current and historical appointments
+    console.log("Fetching appointments for patient:", req.user._id);
+
     const currentAppointments = await Appointment.find({
       patient: req.user._id,
     })
       .populate("doctor", "name email")
       .populate({
         path: "prescription",
-        select: "prescriptionText doctor",
-        options: { strictPopulate: false }, // Avoid errors if prescription does not exist
+        model: "Prescription", // ✅ Ensure prescription is populated
+        populate: { path: "doctor", select: "name email" }, // ✅ Ensure doctor inside prescription is populated
       })
       .sort({ createdAt: -1 });
 
@@ -23,34 +24,23 @@ export const getAppointments = async (req, res) => {
       patient: req.user._id,
     })
       .populate("doctor", "name email")
+      .populate({
+        path: "prescription",
+        model: "Prescription",
+        populate: { path: "doctor", select: "name email" },
+      })
       .sort({ createdAt: -1 });
 
-    // 2. Merge both current and historical appointments
     const allAppointments = [...currentAppointments, ...historicalAppointments];
 
-    // 3. Collect appointment IDs
-    const appointmentIds = allAppointments.map((appt) => appt._id.toString()); // Use `_id` to avoid undefined values
-
-    // 4. Fetch prescriptions linked to these appointments
-    const prescriptions = await Prescription.find({
-      appointmentId: { $in: appointmentIds },
-    }).populate("doctor", "name email");
-
-    // 5. Map prescriptions by appointmentId
-    const presByAppt = {};
-    prescriptions.forEach((p) => {
-      presByAppt[p.appointmentId.toString()] = p;
-    });
-
-    // 6. Attach prescription data to each appointment
-    const appointmentsWithPres = allAppointments.map((appt) => ({
-      ...appt.toObject(),
-      prescription: presByAppt[appt._id.toString()] || null, // Ensure proper mapping
-    }));
+    console.log(
+      "Appointments fetched with prescriptions:",
+      JSON.stringify(allAppointments, null, 2)
+    ); // ✅ Debugging log
 
     res.status(200).json({
       message: "Appointments fetched successfully",
-      appointments: appointmentsWithPres,
+      appointments: allAppointments,
     });
   } catch (error) {
     console.error("Error fetching patient appointments:", error);
@@ -72,7 +62,7 @@ export const bookAppointment = async (req, res) => {
 
     // Create appointment with default status = "Pending"
     const appointment = await Appointment.create({
-      appointmentId,
+      appointmentId: appointmentId.toString(), // 🔥 Ensure it's stored as a string
       patient: req.user._id,
       doctor: doctorId || null,
       appointmentDate,
@@ -119,7 +109,7 @@ export const updateAppointmentStatus = async (req, res) => {
   }
 };
 
-// ✅ Add a prescription
+// ✅ Add a prescription (Fixed)
 export const addPrescription = async (req, res, next) => {
   try {
     const { appointmentId, prescriptionText } = req.body;
@@ -130,7 +120,7 @@ export const addPrescription = async (req, res, next) => {
         .json({ message: "Missing appointmentId or prescription" });
     }
 
-    // Fetch the appointment to get patient information
+    // Fetch the appointment
     const appointment = await Appointment.findOne({ appointmentId }).populate(
       "patient",
       "name _id"
@@ -147,17 +137,17 @@ export const addPrescription = async (req, res, next) => {
 
     const patientId = appointment.patient._id;
 
-    // Save the prescription in the Prescription model
+    // 🔥 Ensure appointmentId is stored as a STRING in Prescription model
     const prescriptionDoc = await Prescription.create({
-      appointmentId: appointment._id, // Ensure the correct ID format
+      appointmentId: appointmentId.toString(), // 🔥 Convert to string to avoid mismatches
       patient: patientId,
       doctor: req.user._id,
       prescription: prescriptionText,
     });
 
-    // Link the new Prescription to the Appointment document
-    await Appointment.findByIdAndUpdate(
-      appointment._id, // Using _id instead of appointmentId
+    // 🔥 Link the new Prescription to the Appointment document
+    await Appointment.findOneAndUpdate(
+      { appointmentId }, // Match by appointmentId as a string
       { $set: { prescription: prescriptionDoc._id } },
       { new: true }
     );
