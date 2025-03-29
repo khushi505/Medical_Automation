@@ -100,3 +100,10 @@ npm run dev
 - Role-based access control (Admin, Doctor, Patient)
 
 ---
+
+## Here is the demo 
+
+
+
+https://github.com/user-attachments/assets/07c2a9ab-96da-4617-9fe7-c44acfe305a5
+
